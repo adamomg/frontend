@@ -1,7 +1,7 @@
 // Run HA develop mode
 const gulp = require("gulp");
 
-const envVars = require("../env");
+const env = require("../env");
 
 require("./clean.js");
 require("./translations.js");
@@ -11,6 +11,7 @@ require("./compress.js");
 require("./webpack.js");
 require("./service-worker.js");
 require("./entry-html.js");
+require("./rollup.js");
 
 gulp.task(
   "develop-app",
@@ -27,7 +28,7 @@ gulp.task(
       "build-translations"
     ),
     "copy-static",
-    "webpack-watch-app"
+    env.useRollup() ? "rollup-watch-app" : "webpack-watch-app"
   )
 );
 
@@ -40,9 +41,9 @@ gulp.task(
     "clean",
     gulp.parallel("gen-icons-json", "build-translations"),
     "copy-static",
-    "webpack-prod-app",
+    env.useRollup() ? "rollup-prod-app" : "webpack-prod-app",
     ...// Don't compress running tests
-    (envVars.isTest() ? [] : ["compress-app"]),
+    (env.isTest() ? [] : ["compress-app"]),
     gulp.parallel(
       "gen-pages-prod",
       "gen-index-app-prod",
